@@ -71,26 +71,47 @@ plt.xlabel("Nombre de chambres")
 plt.ylabel("Fréquence")
 plt.title("Fréquence des nombres de chambres")
 
-# Selection des variables prédictives dont on a besoin
-x = df_boston.drop(columns=["MEDV", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE",
-                            "DIS", "RAD", "PTRATIO", "B"])
-y = boston.target
+# Création des groupes
+boston_nbig = df_boston[df_boston['RM'] <= 6]
+boston_big = df_boston[df_boston['RM'] > 6]
 
-lm = linear_model.LinearRegression()  # regression linéaire
-lm.fit(x,y)
-print(lm.coef_)  # coefficients etimés par la regression linéaire
-print(lm.intercept_)  # valeur de l'intercept
+# Selection des variables prédictives dont on a besoin pour big
+x = boston_big.drop(columns = ["MEDV","ZN","INDUS","CHAS","NOX","AGE","DIS",
+                               "RAD","PTRATIO","B"])  # va explicatives
+y = boston_big['MEDV']  # variable à expliquer
+
+# Création d'échantillon d'apprentissage et de test de façon alétoire
+x_train,x_test, y_train,y_test = train_test_split( x, y,  test_size = 0.2, 
+                                                  random_state = 10)
+lm = linear_model.LinearRegression()
+lm.fit(x_train,y_train)  # application de la régression linéaire sur apprentissage
+print(lm.coef_)  # valeurs estimées des coefficients 
+print(lm.intercept_)  # valeur estimée de l'intercept
+
+# On refait la même chose pour 1-big
+
+x = boston_nbig.drop(columns = ["MEDV","ZN","INDUS","CHAS","NOX","RM","AGE",
+                                "DIS","RAD","PTRATIO","B"])
+y = boston_nbig['MEDV']
+x_train,x_test, y_train,y_test = train_test_split( x, y,  test_size = 0.2, 
+                                                  random_state = 10)
+lm = linear_model.LinearRegression()
+lm.fit(x_train,y_train)
+print(lm.coef_)
+print(lm.intercept_)
 
 # Test sur les séries chronologiques données ChickEgg:
 
 df_ce = pd.read_csv("C:/Users/lenovo/Documents/chickeggcsv")
 df_ce.head()  # chargement des données
+df_ce = df_ce.rename(columns={'Unnamed: 0': 'Years'})
+df_ce.head()
 
 # representation de la serie chronologique pour les poulets:
-ax = sns.lineplot(x='Unnamed: 0',y='chicken',data=df_ce)
+ax = sns.lineplot(x='Years',y='chicken',data=df_ce)
 
 # representation de la serie chronologique des oeufs:
-ax1 = sns.lineplot(x='Unnamed: 0',y='egg',data=df_ce)
+ax1 = sns.lineplot(x='Years',y='egg',data=df_ce)
 
 #test de granger des valeurs des oeufs a partir de celle des poulets:
 model1 = grangercausalitytests(df_ce[["chicken","egg"]], maxlag=3)
