@@ -18,8 +18,7 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.stattools import grangercausalitytests
 import seaborn as sns
-from statsmodels.tsa.stattools import adfuller, acf, pacf
-from statsmodels.tsa.arima_model import ARIMA
+
 
 # Regression linéaire multiple sur données aids:
 
